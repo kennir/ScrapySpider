@@ -8,56 +8,54 @@ import json
 from itertools import *
 
 CATEGORIES = {
-    '207':{
-        'name':'快餐便当',
-        'items':[
-        { 'id':209, 'name':'盖浇饭' },
-        { 'id':213, 'name':'米粉面馆' },
-        { 'id':217, 'name':'饺子馄饨' },
-        { 'id':219, 'name':'香锅砂锅' },
-        { 'id':215, 'name':'包子粥店' },
-        { 'id':214, 'name':'麻辣烫' },
-        { 'id':212, 'name':'汉堡' },
-        { 'id':216, 'name':'生煎锅贴' },
-    ]},
-    '220':{
-        'name':'特色菜系',
-        'items':[
-        {'id': 221, 'name': '川湘菜'},
-        {'id': 263, 'name': '其他菜系'},
-        {'id': 232, 'name': '海鲜'},
-        {'id': 231, 'name': '火锅烤鱼'},
-        {'id': 225, 'name': '江浙菜'},
-        {'id': 222, 'name': '粤菜'},
-        {'id': 223, 'name': '东北菜'},
-        {'id': 226, 'name': '西北菜'},
-        {'id': 228, 'name': '新疆菜'},
-        {'id': 227, 'name': '鲁菜'},
-        {'id': 224, 'name': '云南菜'},
-    ]},
-    '260':{
-        'name':'异国料理',
-        'items':[
-        {'id': 229, 'name': '日韩料理'},
-        {'id': 211, 'name': '披萨意面'},
-        {'id': 230, 'name': '西餐'},
-        {'id': 264, 'name': '东南亚菜'},
-    ]}
+    '207': {
+        'name': '快餐便当',
+        'items': [
+            {'id': 209, 'name': '盖浇饭'},
+            {'id': 213, 'name': '米粉面馆'},
+            {'id': 217, 'name': '饺子馄饨'},
+            {'id': 219, 'name': '香锅砂锅'},
+            {'id': 215, 'name': '包子粥店'},
+            {'id': 214, 'name': '麻辣烫'},
+            {'id': 212, 'name': '汉堡'},
+            {'id': 216, 'name': '生煎锅贴'},
+        ]},
+    '220': {
+        'name': '特色菜系',
+        'items': [
+            {'id': 221, 'name': '川湘菜'},
+            {'id': 263, 'name': '其他菜系'},
+            {'id': 232, 'name': '海鲜'},
+            {'id': 231, 'name': '火锅烤鱼'},
+            {'id': 225, 'name': '江浙菜'},
+            {'id': 222, 'name': '粤菜'},
+            {'id': 223, 'name': '东北菜'},
+            {'id': 226, 'name': '西北菜'},
+            {'id': 228, 'name': '新疆菜'},
+            {'id': 227, 'name': '鲁菜'},
+            {'id': 224, 'name': '云南菜'},
+        ]},
+    '260': {
+        'name': '异国料理',
+        'items': [
+            {'id': 229, 'name': '日韩料理'},
+            {'id': 211, 'name': '披萨意面'},
+            {'id': 230, 'name': '西餐'},
+            {'id': 264, 'name': '东南亚菜'},
+        ]}
 }
 
 LOCATIONS = {
-    '嘉里中心':'wtw3esj',
-    '淮海中路':'wtw3ef9',
-    '浦东国金':'wtw3syu',
-    '上海春城':'wtw2fy9',
-    '人民广场':'wtw3sm0'
+    '嘉里中心': 'wtw3esj',
+    '淮海中路': 'wtw3ef9',
+    '浦东国金': 'wtw3syu',
+    '上海春城': 'wtw2fy9',
+    '人民广场': 'wtw3sm0'
 }
 
 
-
-
-
 class MapGridIterator():
+
     def __init__(self, location_geohash, depth):
         self._cells = set()
         self._next_batch = set([location_geohash])
@@ -107,9 +105,9 @@ class MapGridIterator():
 
 
 class DatabaseUtil():
+    """数据库工具
     """
-    数据库工具
-    """
+
     def __init__(self, location, depth):
         self.location = location
         self.depth = depth
@@ -130,7 +128,8 @@ class DatabaseUtil():
 
             grid_iter = MapGridIterator(LOCATIONS[location], depth)
 
-            cursor.executemany('''INSERT INTO grid(geohash) VALUES (?);''', grid_iter)
+            cursor.executemany(
+                '''INSERT INTO grid(geohash) VALUES (?);''', grid_iter)
             conn.commit()
             logging.getLogger().info('Grid database ready!')
 
@@ -205,46 +204,52 @@ class DatabaseUtil():
                 ''')
             conn.commit()
 
-    def generate_database_names(self, date = None):
-        """
-        生成数据库名称
+    def generate_database_names(self, date=None):
+        """生成数据库名称
         :param date: override date, use datetime.now() if None
         :return: names of database
         """
-        date_label = date if date is not None else datetime.datetime.now().strftime("%Y-%m-%d")
+        date = date if date is not None else \
+            datetime.datetime.now().strftime("%Y-%m-%d")
         return {
-            'date': date_label,
-            'status': '{}({})-{}'.format(self.location, date_label,'status.db'),
-            'data': '{}({})-{}'.format(self.location, date_label,'data.db'),
+            'date': date,
+            'status': '{}({})-{}'.format(self.location, date, 'status.db'),
+            'data': '{}({})-{}'.format(self.location, date, 'data.db'),
         }
 
     def crawl_cell(self):
-        """
-        抓取下一个单元
+        """抓取下一个单元
         :return: 单元的GEOHASH
         """
-        with sqlite3.connect(self.names['status'], isolation_level='EXCLUSIVE', timeout=120) as conn:
+        with sqlite3.connect(self.names['status'],
+                             isolation_level='EXCLUSIVE',
+                             timeout=120) as conn:
             cursor = conn.cursor()
             cursor.execute('BEGIN EXCLUSIVE')
-            cell = cursor.execute('SELECT geohash FROM grid WHERE fetch_status = 0 LIMIT 1').fetchone()
+            cell = cursor.execute(
+                'SELECT geohash FROM grid WHERE fetch_status = 0 LIMIT 1'
+            ).fetchone()
             if cell is not None:
-                cursor.execute('UPDATE grid SET fetch_status = 1 WHERE geohash = ?', cell)
+                cursor.execute(
+                    'UPDATE grid SET fetch_status = 1 WHERE geohash = ?', cell)
             conn.commit()
             return cell
 
     def finish_crawl_cell(self, cell):
-        with sqlite3.connect(self.names['status'], isolation_level='EXCLUSIVE', timeout=120) as conn:
+        with sqlite3.connect(self.names['status'],
+                             isolation_level='EXCLUSIVE',
+                             timeout=120) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                '''UPDATE grid SET fetch_status = 2,commit_date = datetime('now','localtime') WHERE geohash = ?''',
-                cell)
+                '''UPDATE grid SET fetch_status = 2,commit_date = datetime('now','localtime') WHERE geohash = ?''', cell)
             conn.commit()
 
     def write_restaurants(self, restaurants, categories):
-        with sqlite3.connect(self.names['data'], isolation_level='EXCLUSIVE', timeout=120) as conn:
+        with sqlite3.connect(self.names['data'],
+                             isolation_level='EXCLUSIVE',
+                             timeout=120) as conn:
             cursor = conn.cursor()
-            cursor.executemany('''
-                INSERT OR IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?)
+            cursor.executemany('''INSERT OR IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?)
                 ''', restaurants)
             cursor.executemany('''
                 INSERT INTO restaurant_categories(category_id,restaurant_id)
@@ -262,8 +267,6 @@ class DatabaseUtil():
             conn.commit()
 
 
-
-
 class ElemeSpider(scrapy.Spider):
     name = "eleme"
     allowed_domains = ["ele.me"]
@@ -272,7 +275,6 @@ class ElemeSpider(scrapy.Spider):
 
     restaurant_cache = {}
     category_cache = []
-
 
     MENU_CACHE_SIZE = 200
     menu_cache = {}
@@ -288,20 +290,20 @@ class ElemeSpider(scrapy.Spider):
         self.dbutil = DatabaseUtil(location, depth)
         super(ElemeSpider, self).__init__(*args, **kwargs)
 
-
     def start_requests(self):
         cell = self.dbutil.crawl_cell()
         while cell is not None:
-            for key,value in CATEGORIES.items():
+            for key, value in CATEGORIES.items():
                 for item in value['items']:
-                    tuple = (cell[0],key,item['id'])
+                    tuple = (cell[0], key, item['id'])
                     yield scrapy.Request(self.make_url(tuple),
-                                         meta={ 'userdata':tuple },
+                                         meta={'userdata': tuple},
                                          callback=self.parse_restaurant)
             self.dbutil.finish_crawl_cell(cell)
             cell = self.dbutil.crawl_cell()
 
     DETAIL_URL_TEMPLATE = 'https://mainsite-restapi.ele.me/shopping/v1/menu?restaurant_id={}'
+
     def parse_restaurant(self, response):
         userdata = response.meta['userdata']
         json_restaurants = json.loads(response.text)
@@ -338,7 +340,7 @@ class ElemeSpider(scrapy.Spider):
 
     def parse_menu(self, response):
         json_menus = json.loads(response.text)
-        for menu_catalog in json_menus: # 大的分类
+        for menu_catalog in json_menus:  #大的分类
             for json_food in menu_catalog['foods']:
                 name = json_food['name']
                 if name not in self.menu_cache:
@@ -356,7 +358,6 @@ class ElemeSpider(scrapy.Spider):
         if (len(self.menu_cache) >= self.MENU_CACHE_SIZE):
             self.flush_menu_cache()
 
-
     def closed(self, reason):
         self.flush_restaurant_cache()
         self.flush_menu_cache()
@@ -367,7 +368,8 @@ class ElemeSpider(scrapy.Spider):
 
     def flush_restaurant_cache(self):
         # write cache to database
-        self.dbutil.write_restaurants(self.restaurant_cache.values(), self.category_cache)
+        self.dbutil.write_restaurants(
+            self.restaurant_cache.values(), self.category_cache)
         self.restaurant_cache = {}
         self.category_cache = []
 
@@ -377,14 +379,8 @@ class ElemeSpider(scrapy.Spider):
         num_specs = len(food_specs)
         return prices if num_specs == 0 else prices / num_specs
 
+    URL_TEMPLATE = '''https://mainsite-restapi.ele.me/shopping/restaurants?geohash={}&latitude={}&limit=1024&longitude={}&restaurant_category_ids[]={}'''
 
-
-    URL_TEMPLATE = """https://mainsite-restapi.ele.me/shopping/restaurants?geohash={}&latitude={}&limit=1024&longitude={}&restaurant_category_ids[]={}"""
     def make_url(self, tuple):
-        lat,long = geohash.decode(tuple[0])
+        lat, long = geohash.decode(tuple[0])
         return self.URL_TEMPLATE.format(tuple[0], lat, long, tuple[1])
-
-
-
-
-
