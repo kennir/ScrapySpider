@@ -75,13 +75,10 @@ class MapGridIterator():
     def _add_neighbors(self, cell):
         if cell in self._computed_cells:
             return
-
         n = geohash.neighbors(cell)
 
         def cond(c): return (c in self._computed_cells) or (c in self._cells)
-
         n[:] = list(filterfalse(cond, n))
-
         self._next_batch.update(n)
         self._computed_cells.add(cell)
 
@@ -100,7 +97,6 @@ class MapGridIterator():
     def _next_cell(self):
         if len(self._cells) == 0 and self.current_depth < self.max_depth:
             self._advance_depth()
-
         return self._take_cell()
 
 
@@ -340,7 +336,7 @@ class ElemeSpider(scrapy.Spider):
 
     def parse_menu(self, response):
         json_menus = json.loads(response.text)
-        for menu_catalog in json_menus:  #大的分类
+        for menu_catalog in json_menus:
             for json_food in menu_catalog['foods']:
                 name = json_food['name']
                 if name not in self.menu_cache:
