@@ -11,38 +11,110 @@ CATEGORIES = {
     '207': {
         'name': '快餐便当',
         'items': [
-            {'id': 209, 'name': '盖浇饭'},
-            {'id': 213, 'name': '米粉面馆'},
-            {'id': 217, 'name': '饺子馄饨'},
-            {'id': 219, 'name': '香锅砂锅'},
-            {'id': 215, 'name': '包子粥店'},
-            {'id': 214, 'name': '麻辣烫'},
-            {'id': 212, 'name': '汉堡'},
-            {'id': 216, 'name': '生煎锅贴'},
-        ]},
+            {
+                'id': 209,
+                'name': '盖浇饭'
+            },
+            {
+                'id': 213,
+                'name': '米粉面馆'
+            },
+            {
+                'id': 217,
+                'name': '饺子馄饨'
+            },
+            {
+                'id': 219,
+                'name': '香锅砂锅'
+            },
+            {
+                'id': 215,
+                'name': '包子粥店'
+            },
+            {
+                'id': 214,
+                'name': '麻辣烫'
+            },
+            {
+                'id': 212,
+                'name': '汉堡'
+            },
+            {
+                'id': 216,
+                'name': '生煎锅贴'
+            },
+        ]
+    },
     '220': {
         'name': '特色菜系',
         'items': [
-            {'id': 221, 'name': '川湘菜'},
-            {'id': 263, 'name': '其他菜系'},
-            {'id': 232, 'name': '海鲜'},
-            {'id': 231, 'name': '火锅烤鱼'},
-            {'id': 225, 'name': '江浙菜'},
-            {'id': 222, 'name': '粤菜'},
-            {'id': 223, 'name': '东北菜'},
-            {'id': 226, 'name': '西北菜'},
-            {'id': 228, 'name': '新疆菜'},
-            {'id': 227, 'name': '鲁菜'},
-            {'id': 224, 'name': '云南菜'},
-        ]},
+            {
+                'id': 221,
+                'name': '川湘菜'
+            },
+            {
+                'id': 263,
+                'name': '其他菜系'
+            },
+            {
+                'id': 232,
+                'name': '海鲜'
+            },
+            {
+                'id': 231,
+                'name': '火锅烤鱼'
+            },
+            {
+                'id': 225,
+                'name': '江浙菜'
+            },
+            {
+                'id': 222,
+                'name': '粤菜'
+            },
+            {
+                'id': 223,
+                'name': '东北菜'
+            },
+            {
+                'id': 226,
+                'name': '西北菜'
+            },
+            {
+                'id': 228,
+                'name': '新疆菜'
+            },
+            {
+                'id': 227,
+                'name': '鲁菜'
+            },
+            {
+                'id': 224,
+                'name': '云南菜'
+            },
+        ]
+    },
     '260': {
         'name': '异国料理',
         'items': [
-            {'id': 229, 'name': '日韩料理'},
-            {'id': 211, 'name': '披萨意面'},
-            {'id': 230, 'name': '西餐'},
-            {'id': 264, 'name': '东南亚菜'},
-        ]}
+            {
+                'id': 229,
+                'name': '日韩料理'
+            },
+            {
+                'id': 211,
+                'name': '披萨意面'
+            },
+            {
+                'id': 230,
+                'name': '西餐'
+            },
+            {
+                'id': 264,
+                'name': '东南亚菜'
+            },
+        ]
+    }
 }
 
 LOCATIONS = {
@@ -55,7 +127,6 @@ LOCATIONS = {
 
 
 class MapGridIterator():
-
     def __init__(self, location_geohash, depth):
         self._cells = set()
         self._next_batch = set([location_geohash])
@@ -77,7 +148,9 @@ class MapGridIterator():
             return
         n = geohash.neighbors(cell)
 
-        def cond(c): return (c in self._computed_cells) or (c in self._cells)
+        def cond(c):
+            return (c in self._computed_cells) or (c in self._cells)
+
         n[:] = list(filterfalse(cond, n))
         self._next_batch.update(n)
         self._computed_cells.add(cell)
@@ -124,8 +197,8 @@ class DatabaseUtil():
 
             grid_iter = MapGridIterator(LOCATIONS[location], depth)
 
-            cursor.executemany(
-                '''INSERT INTO grid(geohash) VALUES (?);''', grid_iter)
+            cursor.executemany('''INSERT INTO grid(geohash) VALUES (?);''',
+                               grid_iter)
             conn.commit()
             logging.getLogger().info('Grid database ready!')
 
@@ -183,12 +256,8 @@ class DatabaseUtil():
 
             for key, value in CATEGORIES.items():
                 for item in value['items']:
-                    cursor.execute('INSERT INTO category VALUES(?,?,?,?)',
-                                   (item['id'],
-                                    item['name'],
-                                    key,
-                                    value['name']
-                                    ))
+                    cursor.execute('INSERT INTO category VALUES(?,?,?,?)', (
+                        item['id'], item['name'], key, value['name']))
 
             cursor.executescript('''
                     DROP TABLE IF EXISTS restaurant_categories;
@@ -217,9 +286,9 @@ class DatabaseUtil():
         """抓取下一个单元
         :return: 单元的GEOHASH
         """
-        with sqlite3.connect(self.names['status'],
-                             isolation_level='EXCLUSIVE',
-                             timeout=120) as conn:
+        with sqlite3.connect(
+                self.names['status'], isolation_level='EXCLUSIVE',
+                timeout=120) as conn:
             cursor = conn.cursor()
             cursor.execute('BEGIN EXCLUSIVE')
             cell = cursor.execute(
@@ -232,20 +301,22 @@ class DatabaseUtil():
             return cell
 
     def finish_crawl_cell(self, cell):
-        with sqlite3.connect(self.names['status'],
-                             isolation_level='EXCLUSIVE',
-                             timeout=120) as conn:
+        with sqlite3.connect(
+                self.names['status'], isolation_level='EXCLUSIVE',
+                timeout=120) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                '''UPDATE grid SET fetch_status = 2,commit_date = datetime('now','localtime') WHERE geohash = ?''', cell)
+                '''UPDATE grid SET fetch_status = 2,commit_date = datetime('now','localtime') WHERE geohash = ?''',
+                cell)
             conn.commit()
 
     def write_restaurants(self, restaurants, categories):
-        with sqlite3.connect(self.names['data'],
-                             isolation_level='EXCLUSIVE',
-                             timeout=120) as conn:
+        with sqlite3.connect(
+                self.names['data'], isolation_level='EXCLUSIVE',
+                timeout=120) as conn:
             cursor = conn.cursor()
-            cursor.executemany('''INSERT OR IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?)
+            cursor.executemany(
+                '''INSERT OR IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?)
                 ''', restaurants)
             cursor.executemany('''
                 INSERT INTO restaurant_categories(category_id,restaurant_id)
@@ -255,8 +326,11 @@ class DatabaseUtil():
             conn.commit()
 
     def write_menus(self, menus):
-        with sqlite3.connect(self.names['data'], isolation_level='EXCLUSIVE', timeout=120) as conn:
-            conn.executemany('''
+        with sqlite3.connect(
+                self.names['data'], isolation_level='EXCLUSIVE',
+                timeout=120) as conn:
+            cursor = conn.cursor()
+            cursor.executemany('''
                 INSERT INTO menus(restaurant_id,name,pinyin_name,rating,rating_count,price,month_sales,description,category_id)
                 VALUES(?,?,?,?,?,?,?,?,?)
             ''', menus)
@@ -280,7 +354,8 @@ class ElemeSpider(scrapy.Spider):
 
     def __init__(self, location=None, depth=16, *args, **kwargs):
         if location not in LOCATIONS:
-            logging.getLogger().warning('Unknown location, Use "人民广场" as location')
+            logging.getLogger().warning(
+                'Unknown location, Use "人民广场" as location')
             location = '人民广场'
 
         self.dbutil = DatabaseUtil(location, depth)
@@ -292,9 +367,12 @@ class ElemeSpider(scrapy.Spider):
             for key, value in CATEGORIES.items():
                 for item in value['items']:
                     tuple = (cell[0], key, item['id'])
-                    yield scrapy.Request(self.make_url(tuple),
-                                         meta={'userdata': tuple},
-                                         callback=self.parse_restaurant)
+                    yield scrapy.Request(
+                        self.make_url(tuple),
+                        meta={
+                            'userdata': tuple
+                        },
+                        callback=self.parse_restaurant)
             self.dbutil.finish_crawl_cell(cell)
             cell = self.dbutil.crawl_cell()
 
@@ -316,19 +394,17 @@ class ElemeSpider(scrapy.Spider):
                 json_restaurant['longitude'],
                 json_restaurant['address'],
                 json_restaurant['is_premium'],
-                json_restaurant['is_new'],
-            )
-            self.category_cache.append((
-                userdata[2],
-                restaurant_id,
-                userdata[1],
-                restaurant_id,
-            ))
+                json_restaurant['is_new'], )
+            self.category_cache.append((userdata[2],
+                                        restaurant_id,
+                                        userdata[1],
+                                        restaurant_id, ))
 
             # Begin crawl menu
             if restaurant_id not in self.menu_crawled_restaurant_ids:
-                yield scrapy.Request(self.DETAIL_URL_TEMPLATE.format(restaurant_id),
-                                     callback=self.parse_menu)
+                yield scrapy.Request(
+                    self.DETAIL_URL_TEMPLATE.format(restaurant_id),
+                    callback=self.parse_menu)
                 self.menu_crawled_restaurant_ids.add(restaurant_id)
 
         if (len(self.restaurant_cache) >= self.RESTAURANT_CACHE_SIZE):
@@ -349,8 +425,7 @@ class ElemeSpider(scrapy.Spider):
                         ElemeSpider.get_average_price(json_food['specfoods']),
                         json_food['month_sales'],
                         json_food['description'],
-                        json_food['category_id'],
-                    )
+                        json_food['category_id'], )
         if (len(self.menu_cache) >= self.MENU_CACHE_SIZE):
             self.flush_menu_cache()
 
@@ -364,8 +439,8 @@ class ElemeSpider(scrapy.Spider):
 
     def flush_restaurant_cache(self):
         # write cache to database
-        self.dbutil.write_restaurants(
-            self.restaurant_cache.values(), self.category_cache)
+        self.dbutil.write_restaurants(self.restaurant_cache.values(),
+                                      self.category_cache)
         self.restaurant_cache = {}
         self.category_cache = []
 
