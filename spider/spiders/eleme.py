@@ -122,7 +122,8 @@ LOCATIONS = {
     '淮海中路': 'wtw3ef9',
     '浦东国金': 'wtw3syu',
     '上海春城': 'wtw2fy9',
-    '人民广场': 'wtw3sm0'
+    '人民广场': 'wtw3sm0',
+    '龙茗路顾戴路': 'wtw34k0'
 }
 
 
@@ -352,7 +353,7 @@ class ElemeSpider(scrapy.Spider):
     # 记录抓去过菜单的Restaurant ID
     menu_crawled_restaurant_ids = set()
 
-    def __init__(self, location=None, depth=16, *args, **kwargs):
+    def __init__(self, location=None, depth=30, *args, **kwargs):
         if location not in LOCATIONS:
             logging.getLogger().warning(
                 'Unknown location, Use "人民广场" as location')

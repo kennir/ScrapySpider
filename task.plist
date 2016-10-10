@@ -5,21 +5,17 @@
 	<key>StartCalendarInterval</key>
 	<array>
 		<dict>
-			<key>Minute</key>
+			<key>Hour</key>
 			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>Minute</key>
-			<integer>30</integer>
 		</dict>
 	</array>
   <key>ProgramArguments</key>
   <array>
-  <string>~/Developer/2016/ScrapySpider/run.sh</string>
+  <string>/Users/ken/Developer/projects/2016/ScrapySpider/run.sh</string>
   </array>
 	<key>Label</key>
 	<string>com.elegant.spider</string>
   <key>StandardErrorPath</key>
-  <string>~/Developer/2016/ScrapySpider/run-err.log</string>
+  <string>/Users/ken/Developer/projects/2016/ScrapySpider/run-err.log</string>
 </dict>
 </plist>
