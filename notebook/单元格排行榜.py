@@ -108,7 +108,7 @@ full_db = merge_databases(db_list)
 # 生成Geohash数据库
 geohash_db = create_geohash_db(full_db)
 
-geohash_db = geohash_db.head(10)
+# geohash_db = geohash_db.head(10)
 
 
 def cell_ranking(geohash_db_row):
