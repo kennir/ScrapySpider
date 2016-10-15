@@ -91,3 +91,8 @@ ENV/
 .ropeproject
 .DS_Store
 spider/.idea
+
+
+
+# Excel files
+*.xlsx
