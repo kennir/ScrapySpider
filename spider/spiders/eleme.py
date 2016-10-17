@@ -117,15 +117,23 @@ CATEGORIES = {
     }
 }
 
-LOCATIONS = {
-    '嘉里中心': 'wtw3esj',
-    '淮海中路': 'wtw3ef9',
-    '浦东国金': 'wtw3syu',
-    '上海春城': 'wtw2fy9',
-    '人民广场': 'wtw3sm0',
-    '龙茗路顾戴路': 'wtw34k0'
-}
+# LOCATIONS = {
+#     '嘉里中心': 'wtw3esj',
+#     '淮海中路': 'wtw3ef9',
+#     '浦东国金': 'wtw3syu',
+#     '上海春城': 'wtw2fy9',
+#     '人民广场': 'wtw3sm0',
+#     '龙茗路顾戴路': 'wtw34k0'
+# }
 
+LOCATIONS = {
+    '嘉里中心': 'wtw3es',
+    '淮海中路': 'wtw3ef',
+    '浦东国金': 'wtw3sy',
+    '上海春城': 'wtw2fy',
+    'PeoplesSquare': 'wtw3sm',
+    '龙茗路顾戴路': 'wtw34k'
+}
 
 class MapGridIterator():
     def __init__(self, location_geohash, depth):
