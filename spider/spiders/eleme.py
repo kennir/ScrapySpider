@@ -6,6 +6,8 @@ import sqlite3
 import datetime
 import json
 from itertools import *
+from geopy import Point
+from geopy.distance import distance, VincentyDistance
 
 CATEGORIES = {
     '207': {
@@ -135,7 +137,86 @@ LOCATIONS = {
 #     '龙茗路顾戴路': 'wtw34k'
 # }
 
-class MapGridIterator():
+
+class Location():
+    """传入经纬度，生成GEOHASH"""
+    GeohashEncodingLength = 8
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and getattr(other, 'hash_code', None) == self.hash_code)
+
+    def __hash__(self):
+        return hash(self.hash_code)
+
+    def __init__(self, point, geohash_length=GeohashEncodingLength):
+        self.point = point
+        self.hash_code = geohash.encode(self.point.latitude, self.point.longitude, geohash_length)
+
+
+class MapGridIteratorUsingLatitudeAndLongitude():
+    """使用经纬度遍历
+    """
+    def __init__(self, point, distance, depth):
+        self.center = Location(point)
+        self.current_depth = 0
+        self.max_depth = depth
+        self.locations = set()
+        self.next_batch = set([self.center])
+        self.computed_locations = set()
+        self.distance = distance
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        location = self.next_location()
+        if location is None:
+            raise StopIteration
+        print(location.hash_code)
+        return location.hash_code,
+
+    def get_neighbors(self, location):
+        return [Location(VincentyDistance(meters=self.distance).destination(location.point, 0.0)),
+                Location(VincentyDistance(meters=self.distance).destination(location.point, 90.0)),
+                Location(VincentyDistance(meters=self.distance).destination(location.point, 180.0)),
+                Location(VincentyDistance(meters=self.distance).destination(location.point, 270.0))]
+
+    def add_neighbors(self, location):
+        if location in self.computed_locations:
+            return
+
+        n = self.get_neighbors(location)
+
+        def cond(c):
+            return (c in self.computed_locations) or (c in self.locations)
+
+        n[:] = list(filterfalse(cond, n))
+
+        for hashcode in n:
+            print('add', hashcode.hash_code)
+
+        self.next_batch.update(n)
+        self.computed_locations.add(location)
+
+    def advance_depth(self):
+        self.locations = self.next_batch
+        self.next_batch = set()
+        self.current_depth += 1
+
+    def take_location(self):
+        if len(self.locations) == 0:
+            return None
+        location = self.locations.pop()
+        self.add_neighbors(location)
+        return location
+
+    def next_location(self):
+        if len(self.locations) == 0 and self.current_depth < self.max_depth:
+            self.advance_depth()
+        return self.take_location()
+
+
+class MapGridIteratorUsingGeohash():
     def __init__(self, location_geohash, depth):
         self._cells = set()
         self._next_batch = set([location_geohash])
@@ -186,8 +267,10 @@ class DatabaseUtil():
     """数据库工具
     """
 
-    def __init__(self, location, depth):
+    def __init__(self, name, location, distance, depth):
+        self.name = name
         self.location = location
+        self.distance = distance
         self.depth = depth
         self.names = self.generate_database_names()
 
@@ -204,7 +287,8 @@ class DatabaseUtil():
                     );
             ''')
 
-            grid_iter = MapGridIterator(LOCATIONS[location], depth)
+            # grid_iter = MapGridIterator(LOCATIONS[location], depth)
+            grid_iter = MapGridIteratorUsingLatitudeAndLongitude(location, distance, depth)
 
             cursor.executemany('''INSERT INTO grid(geohash) VALUES (?);''',
                                grid_iter)
@@ -287,8 +371,8 @@ class DatabaseUtil():
             datetime.datetime.now().strftime("%Y-%m-%d")
         return {
             'date': date,
-            'status': '{}({})-{}'.format(self.location, date, 'status.db'),
-            'data': '{}({})-{}'.format(self.location, date, 'data.db'),
+            'status': '{}({})-{}'.format(self.name, date, 'status.db'),
+            'data': '{}({})-{}'.format(self.name, date, 'data.db'),
         }
 
     def crawl_cell(self):
@@ -358,16 +442,13 @@ class ElemeSpider(scrapy.Spider):
     MENU_CACHE_SIZE = 200
     menu_cache = {}
 
+    Shanghai = Point(latitude=31.230416, longitude=121.473701)
+
     # 记录抓去过菜单的Restaurant ID
     menu_crawled_restaurant_ids = set()
 
-    def __init__(self, location=None, depth=200, *args, **kwargs):
-        if location not in LOCATIONS:
-            logging.getLogger().warning(
-                'Unknown location, Use "人民广场" as location')
-            location = '人民广场'
-
-        self.dbutil = DatabaseUtil(location, depth)
+    def __init__(self, distance=250, depth=200, *args, **kwargs):
+        self.dbutil = DatabaseUtil('Shanghai', self.Shanghai, float(distance), int(depth))
         super(ElemeSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
