@@ -119,23 +119,23 @@ CATEGORIES = {
     }
 }
 
-LOCATIONS = {
-    '嘉里中心': 'wtw3esj',
-    '淮海中路': 'wtw3ef9',
-    '浦东国金': 'wtw3syu',
-    '上海春城': 'wtw2fy9',
-    'PeoplesSquare': 'wtw3sm0',
-    '龙茗路顾戴路': 'wtw34k0'
-}
-
 # LOCATIONS = {
-#     '嘉里中心': 'wtw3es',
-#     '淮海中路': 'wtw3ef',
-#     '浦东国金': 'wtw3sy',
-#     '上海春城': 'wtw2fy',
-#     'PeoplesSquare': 'wtw3sm',
-#     '龙茗路顾戴路': 'wtw34k'
+#     '嘉里中心': 'wtw3esj',
+#     '淮海中路': 'wtw3ef9',
+#     '浦东国金': 'wtw3syu',
+#     '上海春城': 'wtw2fy9',
+#     'PeoplesSquare': 'wtw3sm0',
+#     '龙茗路顾戴路': 'wtw34k0'
 # }
+
+LOCATIONS = {
+    '嘉里中心': 'wtw3es',
+    '淮海中路': 'wtw3ef',
+    '浦东国金': 'wtw3sy',
+    '上海春城': 'wtw2fy',
+    'PeoplesSquare': 'wtw3sm',
+    '龙茗路顾戴路': 'wtw34k'
+}
 
 
 class Location():
@@ -267,7 +267,7 @@ class DatabaseUtil():
     """数据库工具
     """
 
-    def __init__(self, name, location, distance, depth):
+    def __init__(self, name, location, distance=None, depth=25):
         self.name = name
         self.location = location
         self.distance = distance
@@ -287,8 +287,8 @@ class DatabaseUtil():
                     );
             ''')
 
-            # grid_iter = MapGridIterator(LOCATIONS[location], depth)
-            grid_iter = MapGridIteratorUsingLatitudeAndLongitude(location, distance, depth)
+            grid_iter = MapGridIteratorUsingGeohash(location, depth)
+            # grid_iter = MapGridIteratorUsingLatitudeAndLongitude(location, distance, depth)
 
             cursor.executemany('''INSERT INTO grid(geohash) VALUES (?);''',
                                grid_iter)
@@ -443,11 +443,12 @@ class ElemeSpider(scrapy.Spider):
     menu_cache = {}
 
     Shanghai = Point(latitude=31.230416, longitude=121.473701)
+    ShanghaiGeohash = 'wtw3sm'
 
     # 记录抓去过菜单的Restaurant ID
     menu_crawled_restaurant_ids = set()
 
-    def __init__(self, distance=250, depth=200, *args, **kwargs):
+    def __init__(self, distance=500, depth=30, *args, **kwargs):
         self.dbutil = DatabaseUtil('Shanghai', self.Shanghai, float(distance), int(depth))
         super(ElemeSpider, self).__init__(*args, **kwargs)
 
