@@ -449,7 +449,8 @@ class ElemeSpider(scrapy.Spider):
     menu_crawled_restaurant_ids = set()
 
     def __init__(self, distance=500, depth=30, *args, **kwargs):
-        self.dbutil = DatabaseUtil('Shanghai', self.Shanghai, float(distance), int(depth))
+        # self.dbutil = DatabaseUtil('Shanghai', self.Shanghai, float(distance), int(depth))
+        self.dbutil = DatabaseUtil('Shanghai', self.ShanghaiGeohash, float(distance), int(depth))
         super(ElemeSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
