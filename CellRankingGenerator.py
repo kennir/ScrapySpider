@@ -55,9 +55,12 @@ def load_database(db_name):
     # 计算平均价格
     restaurants_db['average_price'] = restaurants_db[
         'revenue'] / restaurants_db['month_sales']
-
     restaurants_db['revenue'] = restaurants_db['revenue'].fillna(0)
     del restaurants_db['restaurant_id']
+
+    print('Remove invalid restaurants!', restaurants_db.shape[0])
+    restaurants_db = restaurants_db[restaurants_db.average_price < 300]
+    print('Remove invalid restaurants!', restaurants_db.shape[0])
 
     return restaurants_db
 
