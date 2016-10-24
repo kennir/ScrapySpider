@@ -36,8 +36,12 @@ def load_database(db_name):
     menus_db['revenue'] = menus_db['price'] * menus_db['month_sales']
 
     # 合并到主数据库
-    revenue_db = menus_db.loc[:, ['restaurant_id', 'revenue']].groupby(
+    revenue_db = menus_db.loc[:, ['restaurant_id', 'revenue', 'month_sales']].groupby(
         'restaurant_id').sum().reset_index(drop=False)
+
+    # ele有坑，商铺信息里的month_sales和菜单里的不一致，导致均价不准确
+    del restaurants_db['month_sales']
+
     restaurants_db = pd.merge(
         restaurants_db,
         revenue_db,
