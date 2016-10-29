@@ -506,9 +506,9 @@ class ElemeSpider(scrapy.Spider):
         json_menus = json.loads(response.text)
         for menu_catalog in json_menus:
             for json_food in menu_catalog['foods']:
-                name = json_food['name']
-                if name not in self.menu_cache:
-                    self.menu_cache[name] = (
+                cache_key = '{}-{}'.format(json_food['restaurant_id'], json_food['name'])
+                if cache_key not in self.menu_cache:
+                    self.menu_cache[cache_key] = (
                         json_food['restaurant_id'],
                         name,
                         json_food['pinyin_name'],
