@@ -510,7 +510,7 @@ class ElemeSpider(scrapy.Spider):
                 if cache_key not in self.menu_cache:
                     self.menu_cache[cache_key] = (
                         json_food['restaurant_id'],
-                        name,
+                        json_food['name'],
                         json_food['pinyin_name'],
                         json_food['rating'],
                         json_food['rating_count'],
