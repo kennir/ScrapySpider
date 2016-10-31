@@ -440,7 +440,7 @@ class ElemeSpider(scrapy.Spider):
     category_cache = []
 
     MENU_CACHE_SIZE = 200
-    menu_cache = {}
+    menu_cache = []
 
     Shanghai = Point(latitude=31.230416, longitude=121.473701)
     ShanghaiGeohash = 'wtw3sm'
@@ -503,12 +503,14 @@ class ElemeSpider(scrapy.Spider):
             self.flush_restaurant_cache()
 
     def parse_menu(self, response):
+        added_menu = []
+
         json_menus = json.loads(response.text)
         for menu_catalog in json_menus:
             for json_food in menu_catalog['foods']:
-                cache_key = '{}-{}'.format(json_food['restaurant_id'], json_food['name'])
-                if cache_key not in self.menu_cache:
-                    self.menu_cache[cache_key] = (
+                name = json_food['name']
+                if name not in added_menu:
+                    self.menu_cache.append((
                         json_food['restaurant_id'],
                         json_food['name'],
                         json_food['pinyin_name'],
@@ -517,7 +519,8 @@ class ElemeSpider(scrapy.Spider):
                         ElemeSpider.get_average_price(json_food['specfoods']),
                         json_food['month_sales'],
                         json_food['description'],
-                        json_food['category_id'], )
+                        json_food['category_id'], ))
+                    added_menu.append(name)
         if (len(self.menu_cache) >= self.MENU_CACHE_SIZE):
             self.flush_menu_cache()
 
@@ -526,8 +529,8 @@ class ElemeSpider(scrapy.Spider):
         self.flush_menu_cache()
 
     def flush_menu_cache(self):
-        self.dbutil.write_menus(self.menu_cache.values())
-        self.menu_cache = {}
+        self.dbutil.write_menus(self.menu_cache)
+        self.menu_cache = []
 
     def flush_restaurant_cache(self):
         # write cache to database
