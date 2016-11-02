@@ -16,8 +16,8 @@ NEWSPIDER_MODULE = 'spider.spiders'
 
 LOG_LEVEL = 'ERROR'
 
-FEED_URI='output.csv'
-FEED_FORMAT='csv'
+# FEED_URI='output.csv'
+# FEED_FORMAT='csv'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'spider (+http://www.yourdomain.com)'
@@ -69,7 +69,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'spider.pipelines.HomeRemoveInvalidCharPipeline': 300,
+   'spider.pipelines.HomeSqlStorePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
