@@ -62,23 +62,23 @@ class AnjukeSpider(scrapy.Spider):
 
             # house-title
             title_sel = detail_sel.xpath('div[@class="house-title"]/a')
-            item['title'] = title_sel.xpath('@title').extract_first().encode('utf-8')
-            item['company'] = title_sel.xpath('@data-company').extract_first().encode('utf-8')
-            item['url'] = title_sel.xpath('@href').extract_first().encode('utf-8')
+            item['title'] = title_sel.xpath('@title').extract_first().replace('\xb2', '')
+            item['company'] = title_sel.xpath('@data-company').extract_first().replace('\xb2', '')
+            item['url'] = title_sel.xpath('@href').extract_first().replace('\xb2', '')
 
             # details-item
             details_item_sel = detail_sel.xpath('div[@class="details-item"][1]')
-            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first().encode('utf-8')
-            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first().encode('utf-8')
-            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first().encode('utf-8')
-            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first().encode('utf-8')
-            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first().encode('utf-8')
+            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first().replace('\xb2', '')
+            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first().replace('\xb2', '')
+            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first().replace('\xb2', '')
+            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first().replace('\xb2', '')
+            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first().replace('\xb2', '')
 
             comm_addr = list(filter(None, detail_sel.xpath('div[@class="details-item"][2]/span/@title').extract_first().split('\xa0', 2)))
-            item['community'] = comm_addr[0].encode('utf-8')
-            item['address'] = comm_addr[1].encode('utf-8')
+            item['community'] = comm_addr[0].replace('\xb2', '')
+            item['address'] = comm_addr[1].replace('\xb2', '')
 
-            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first().encode('utf-8')
+            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first().replace('\xb2', '')
 
             yield item
 
