@@ -18,7 +18,6 @@ LOG_LEVEL = 'ERROR'
 
 FEED_URI='output.csv'
 FEED_FORMAT='csv'
-FEED_EXPORT_ENCODING='utf-8'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'spider (+http://www.yourdomain.com)'
@@ -69,9 +68,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'spider.pipelines.HomeSqlite3Pipeline': 300,
-# }
+ITEM_PIPELINES = {
+   'spider.pipelines.HomeRemoveInvalidCharPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
