@@ -15,6 +15,8 @@ class AnjukeSpider(scrapy.Spider):
     name = "anjuke"
     allowed_domains = ["anjuke.com"]
 
+    num_pages = 0
+
     # 二级地址
     districts = {}
 
@@ -54,6 +56,10 @@ class AnjukeSpider(scrapy.Spider):
     def parse_next_page(self, response):
         """房屋信息
         """
+
+        self.num_pages = self.num_pages + 1
+        logging.getLogger().info('Crawled Pages: %d', self.num_pages)
+
         meta = response.meta
         for sel in response.selector.xpath('//ul[@class="houselist-mod"]/li'):
             item = Home(district=meta['district'], block=meta['block'])
@@ -88,3 +94,8 @@ class AnjukeSpider(scrapy.Spider):
             yield scrapy.Request(self.URL_TEMPLATE.format(meta['block'], meta['page']),
                                  meta=meta,
                                  callback=self.parse_next_page)
+        else:
+            logging.getLogger().info('%s - %s Finished! Total pages:%d',
+                                     meta['district'],
+                                     meta['block'],
+                                     meta['page'])

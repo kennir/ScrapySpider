@@ -14,7 +14,7 @@ BOT_NAME = 'spider'
 SPIDER_MODULES = ['spider.spiders']
 NEWSPIDER_MODULE = 'spider.spiders'
 
-LOG_LEVEL = 'ERROR'
+LOG_LEVEL = 'INFO'
 
 # FEED_URI='output.csv'
 # FEED_FORMAT='csv'

@@ -7,6 +7,7 @@
 
 import sqlite3
 import datetime
+import logging
 from os import path
 from scrapy import signals
 from scrapy.xlib.pydispatch import dispatcher
@@ -14,6 +15,7 @@ from scrapy.xlib.pydispatch import dispatcher
 
 class HomeSqlStorePipeline(object):
     num_inserted = 0
+    cached = 0
 
     def __init__(self):
         self.conn = None
@@ -40,16 +42,18 @@ class HomeSqlStorePipeline(object):
                                float(item['price'])
                                ))
             self.num_inserted = self.num_inserted + 1
-            if self.num_inserted > 100:
+            self.cached = self.cached + 1
+            if self.cached > 100:
                 self.conn.commit()
-                self.num_inserted = 0
+                self.cached = 0
+
         except:
             spider.getLogger().error("Can't write to database")
 
         return item
 
     def initialize(self):
-        print('-----------------DATABASE READY!--------------------')
+        logging.getLogger().info('-----------------DATABASE READY!--------------------')
         self.conn = sqlite3.connect('anjuke({}).db'.format(
             datetime.datetime.now().strftime("%Y-%m-%d")))
         self.conn.executescript('''
@@ -77,4 +81,5 @@ class HomeSqlStorePipeline(object):
             self.conn.commit()
             self.conn.close()
             self.conn = None
-        print('-----------------DATABASE CLOSED!--------------------')
+        logging.getLogger().info('Number of ', self.num_inserted, 'records')
+        logging.getLogger().info('-----------------DATABASE CLOSED!--------------------')
