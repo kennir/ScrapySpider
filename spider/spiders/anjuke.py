@@ -11,8 +11,6 @@ from geopy import Point
 from geopy.distance import distance, VincentyDistance
 from spider.items import Home
 
-
-
 class AnjukeSpider(scrapy.Spider):
     name = "anjuke"
     allowed_domains = ["anjuke.com"]
@@ -64,23 +62,23 @@ class AnjukeSpider(scrapy.Spider):
 
             # house-title
             title_sel = detail_sel.xpath('div[@class="house-title"]/a')
-            item['title'] = title_sel.xpath('@title').extract_first()
-            item['company'] = title_sel.xpath('@data-company').extract_first()
-            item['url'] = title_sel.xpath('@href').extract_first()
+            item['title'] = title_sel.xpath('@title').extract_first().encode('utf-8')
+            item['company'] = title_sel.xpath('@data-company').extract_first().encode('utf-8')
+            item['url'] = title_sel.xpath('@href').extract_first().encode('utf-8')
 
             # details-item
             details_item_sel = detail_sel.xpath('div[@class="details-item"][1]')
-            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first()
-            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first()
-            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first()
-            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first()
-            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first()
+            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first().encode('utf-8')
+            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first().encode('utf-8')
+            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first().encode('utf-8')
+            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first().encode('utf-8')
+            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first().encode('utf-8')
 
             comm_addr = list(filter(None, detail_sel.xpath('div[@class="details-item"][2]/span/@title').extract_first().split('\xa0', 2)))
-            item['community'] = comm_addr[0]
-            item['address'] = comm_addr[1]
+            item['community'] = comm_addr[0].encode('utf-8')
+            item['address'] = comm_addr[1].encode('utf-8')
 
-            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first()
+            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first().encode('utf-8')
 
             yield item
 
