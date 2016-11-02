@@ -62,28 +62,28 @@ class AnjukeSpider(scrapy.Spider):
 
             # house-title
             title_sel = detail_sel.xpath('div[@class="house-title"]/a')
-            item['title'] = title_sel.xpath('@title').extract_first().replace('\xb2', '')
-            item['company'] = title_sel.xpath('@data-company').extract_first().replace('\xb2', '')
-            item['url'] = title_sel.xpath('@href').extract_first().replace('\xb2', '')
+            item['title'] = title_sel.xpath('@title').extract_first()
+            item['company'] = title_sel.xpath('@data-company').extract_first()
+            item['url'] = title_sel.xpath('@href').extract_first()
 
             # details-item
             details_item_sel = detail_sel.xpath('div[@class="details-item"][1]')
-            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first().replace('\xb2', '')
-            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first().replace('\xb2', '')
-            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first().replace('\xb2', '')
-            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first().replace('\xb2', '')
-            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first().replace('\xb2', '')
+            item['area'] = details_item_sel.xpath('span[1]/text()').extract_first()
+            item['type'] = details_item_sel.xpath('span[2]/text()').extract_first()
+            item['price_per_sqm'] = details_item_sel.xpath('span[3]/text()').extract_first()
+            item['floor'] = details_item_sel.xpath('span[4]/text()').extract_first()
+            item['built_date'] = details_item_sel.xpath('span[5]/text()').extract_first()
 
             comm_addr = list(filter(None, detail_sel.xpath('div[@class="details-item"][2]/span/@title').extract_first().split('\xa0', 2)))
-            item['community'] = comm_addr[0].replace('\xb2', '')
-            item['address'] = comm_addr[1].replace('\xb2', '')
+            item['community'] = comm_addr[0]
+            item['address'] = comm_addr[1]
 
-            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first().replace('\xb2', '')
+            item['price'] = sel.xpath('div[@class="pro-price"]/span[@class="price-det"]/strong/text()').extract_first()
 
             yield item
 
         # 检查是否还有下一页
-        if response.selector.xpath('//div[@class="multi-page"]/a[@class="aNxt"]') is not None:
+        if response.selector.xpath('//div[@class="multi-page"]/a[@class="aNxt"]').extract_first() is not None:
             meta['page'] = meta['page'] + 1
             yield scrapy.Request(self.URL_TEMPLATE.format(meta['block'], meta['page']),
                                  meta=meta,

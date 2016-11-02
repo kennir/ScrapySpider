@@ -18,6 +18,7 @@ LOG_LEVEL = 'ERROR'
 
 FEED_URI='output.csv'
 FEED_FORMAT='csv'
+FEED_EXPORT_ENCODING='utf-8'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'spider (+http://www.yourdomain.com)'
