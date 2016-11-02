@@ -81,5 +81,5 @@ class HomeSqlStorePipeline(object):
             self.conn.commit()
             self.conn.close()
             self.conn = None
-        logging.getLogger().info('Number of ', self.num_inserted, 'records')
+        logging.getLogger().info('%d 条记录被抓取', self.num_inserted)
         logging.getLogger().info('-----------------DATABASE CLOSED!--------------------')
