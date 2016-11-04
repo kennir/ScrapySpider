@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
 import scrapy
-import geohash
-import sqlite3
-import datetime
-import json
 from urllib.parse import urlparse
-from itertools import *
-from geopy import Point
-from geopy.distance import distance, VincentyDistance
 from spider.items import Home
+
 
 class AnjukeSpider(scrapy.Spider):
     name = "anjuke"
