@@ -442,8 +442,8 @@ class ElemeSpider(scrapy.Spider):
     MENU_CACHE_SIZE = 200
     menu_cache = []
 
-    Shanghai = Point(latitude=31.230416, longitude=121.473701)
-    ShanghaiGeohash = 'wtw3sm'
+    Shanghai = Point(latitude=31.17772065, longitude=121.38636030)
+    ShanghaiGeohash = 'wtw365'
 
     # 记录抓去过菜单的Restaurant ID
     menu_crawled_restaurant_ids = set()
